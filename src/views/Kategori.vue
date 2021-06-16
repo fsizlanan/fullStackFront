@@ -33,7 +33,7 @@
             <h3>Alt Kategoriler</h3>
             <div
               class="list-group categories"
-              v-for="index in altKategori"
+              v-for="index in altKategori.altKategori"
               :key="index.id"
             >
               <router-link
@@ -46,7 +46,9 @@
                 tag="a"
                 class="list-group-item"
               >
-                <i class="fa fa-arrow-circle-right"> {{ index.kategori_adi }}</i>
+                <i class="fa fa-arrow-circle-right">
+                  {{ index.kategori_adi }}</i
+                >
               </router-link>
             </div>
             <form>
@@ -72,20 +74,35 @@
           <a href="?order=yeni" class="btn btn-default">Yeni Ürünler</a>
           <hr />
           <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-12" v-if="altKategori.urunler.length == 0">
               Bu kategoride henüz ürün bulunmamaktadır.
             </div>
-            <div class="col-md-3 product">
+            <div
+              class="col-md-3 product"
+              v-for="urun in altKategori.urunler"
+              :key="urun.id"
+              v-else
+            >
               <a href=""
-                ><img src="http://via.placeholder.com/400x400?text=UrunResmi"
+                ><img src="http://via.placeholder.com/200x200?text=UrunResmi"
               /></a>
               <p>
-                <a href=""></a>
+                <router-link
+                  :to="{
+                    name: 'Urun',
+                    params: {
+                      slug: urun.slug
+                    }
+                  }"
+                  class=""
+                  tag="a"
+                >
+                  {{ urun.urun_adi }}
+                </router-link>
               </p>
-              <p class="price">₺</p>
+              <p class="price">{{ urun.fiyati }} ₺</p>
               <p><a href="#" class="btn btn-theme">Sepete Ekle</a></p>
             </div>
-            @endforeach
           </div>
         </div>
       </div>
@@ -100,7 +117,10 @@ export default {
   data() {
     return {
       kategori: [],
-      altKategori: []
+      altKategori: {
+        altKategori: [],
+        urunler: []
+      }
     };
   },
   computed: {},
@@ -114,7 +134,8 @@ export default {
         console.log(err);
       });
     axios.get("http://localhost:8000/api/kategori/" + this.slug).then(res => {
-      this.altKategori = res.data;
+      this.altKategori.altKategori = res.data.alt_kategoriler;
+      this.altKategori.urunler = res.data.urunler;
     });
   }
 };

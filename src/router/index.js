@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 // import Home from "../views/Home.vue";
 import Anasayfa from "../views/AnaSayfa.vue";
 import Kategori from "../views/Kategori.vue";
+import Urun from "../views/Urun.vue";
 
 Vue.use(VueRouter);
 
@@ -30,6 +31,12 @@ const routes = [
     path: "/kategori/:slug",
     name: "Kategori",
     component: Kategori,
+    props: true
+  },
+  {
+    path: "/urun/:slug",
+    name: "Urun",
+    component: Urun,
     props: true
   }
 ];
