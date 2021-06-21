@@ -4,6 +4,8 @@ import VueRouter from "vue-router";
 import Anasayfa from "../views/AnaSayfa.vue";
 import Kategori from "../views/Kategori.vue";
 import Urun from "../views/Urun.vue";
+import Search from "../components/SearchComponent.vue";
+import Kaydol from "../components/kullanici/KaydolComponent.vue";
 
 Vue.use(VueRouter);
 
@@ -38,6 +40,17 @@ const routes = [
     name: "Urun",
     component: Urun,
     props: true
+  },
+  {
+    path : "/urun_ara",
+    name : "Search",
+    component : Search,
+    props : true
+  },
+  {
+    path : "/kaydol",
+    name : "Kaydol",
+    component : Kaydol,
   }
 ];
 

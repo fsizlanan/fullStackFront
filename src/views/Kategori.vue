@@ -21,7 +21,7 @@
           }"
           tag="a"
           class="btn btn-success"
-          >{{ kategori[0].kategori_adi }}</router-link
+          >{{ kategori.kategori_adi }}</router-link
         >
       </li>
     </ol>
@@ -54,12 +54,22 @@
             <form>
               <div class="form-group">
                 <div class="checkbox">
-                  <label> <input type="checkbox" /> 100-200 </label>
+                  <label>
+                    <input @change="check()" v-model="onbin" type="checkbox" />
+                    0-10000
+                  </label>
                 </div>
               </div>
               <div class="form-group">
                 <div class="checkbox">
-                  <label> <input type="checkbox" /> 200-300 </label>
+                  <label>
+                    <input
+                      @change="check2()"
+                      v-model="onbinuzeri"
+                      type="checkbox"
+                    />
+                    1000 üzeri
+                  </label>
                 </div>
               </div>
             </form>
@@ -70,8 +80,12 @@
       <div class="col-md-9">
         <div class="products bg-content">
           Sırala
-          <a href="?order=coksatanlar" class="btn btn-default">Çok Satanlar</a>
-          <a href="?order=yeni" class="btn btn-default">Yeni Ürünler</a>
+          <button @click="cokSatanlar" class="btn btn-default bg-danger">
+            Çok Satanlar
+          </button>
+          <button @click="yeniUrunler" class="btn btn-default bg-info ml-2">
+            Yeni Ürünler
+          </button>
           <hr />
           <div class="row">
             <div class="col-md-12" v-if="altKategori.urunler.length == 0">
@@ -94,14 +108,14 @@
                       slug: urun.slug
                     }
                   }"
-                  class=""
+                  class="btn btn-info mt-2"
                   tag="a"
                 >
                   {{ urun.urun_adi }}
                 </router-link>
               </p>
-              <p class="price">{{ urun.fiyati }} ₺</p>
-              <p><a href="#" class="btn btn-theme">Sepete Ekle</a></p>
+              <p class="price bg-secondary">{{ urun.fiyati }} ₺</p>
+              <p><a href="#" class="btn btn-success">Sepete Ekle</a></p>
             </div>
           </div>
         </div>
@@ -120,7 +134,11 @@ export default {
       altKategori: {
         altKategori: [],
         urunler: []
-      }
+      },
+      filtre: [],
+      onbin: false,
+      onbinuzeri: false,
+      fiyat: 0
     };
   },
   computed: {},
@@ -128,7 +146,7 @@ export default {
     axios
       .get("http://localhost:8000/api/anasayfa/" + this.slug)
       .then(res => {
-        this.kategori = res.data;
+        this.kategori = res.data[0];
       })
       .catch(err => {
         console.log(err);
@@ -137,7 +155,76 @@ export default {
       this.altKategori.altKategori = res.data.alt_kategoriler;
       this.altKategori.urunler = res.data.urunler;
     });
-  }
+  },
+
+  methods: {
+    cokSatanlar() {
+      axios
+        .get(
+          "http://localhost:8000/api/kategori/" +
+            this.slug +
+            "?order=coksatanlar"
+        )
+        .then(res => {
+          this.altKategori.urunler = res.data.urunler;
+        });
+    },
+    yeniUrunler() {
+      axios
+        .get("http://localhost:8000/api/kategori/" + this.slug + "?order=yeni")
+        .then(res => {
+          this.altKategori.urunler = res.data.urunler;
+        });
+    },
+    check() {
+      if (this.onbin == true) {
+        this.fiyat = 10;
+        this.onbinuzeri = false;
+        axios
+          .get(
+            "http://localhost:8000/api/kategori/" +
+              this.slug +
+              "?fiyati=" +
+              this.fiyat
+          )
+          .then(res => {
+            this.altKategori.urunler = res.data.filter;
+          });
+      } else {
+        axios
+          .get("http://localhost:8000/api/kategori/" + this.slug)
+          .then(res => {
+            this.altKategori.altKategori = res.data.alt_kategoriler;
+            this.altKategori.urunler = res.data.urunler;
+          });
+      }
+    },
+
+    check2() {
+      if (this.onbinuzeri == true) {
+        this.onbin = false;
+        this.fiyat = 10.001;
+        axios
+          .get(
+            "http://localhost:8000/api/kategori/" +
+              this.slug +
+              "?fiyati=" +
+              this.fiyat
+          )
+          .then(res => {
+            this.altKategori.urunler = res.data.filter;
+          });
+      } else {
+        axios
+          .get("http://localhost:8000/api/kategori/" + this.slug)
+          .then(res => {
+            this.altKategori.altKategori = res.data.alt_kategoriler;
+            this.altKategori.urunler = res.data.urunler;
+          });
+      }
+    }
+  },
+  watch: {}
 };
 </script>
 
